@@ -29,52 +29,120 @@
   },
   "legalName": "合同会社TEB"
 }
+
+  // Modal
+  function openModal(type) {
+    document.getElementById('modal-overlay').classList.add('active');
+    const modal = document.getElementById('modal-' + type);
+    modal.style.display = 'block';
+    setTimeout(() => modal.classList.add('active'), 10);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.querySelectorAll('.modal').forEach(m => {
+      m.classList.remove('active');
+      setTimeout(() => { if (!m.classList.contains('active')) m.style.display = 'none'; }, 250);
+    });
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,300&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --ink: #18181b;
-    --muted: #71717a;
-    --light: #f4f4f5;
-    --border: #e4e4e7;
+    --ink: #0d0d0d;
+    --muted: #888;
+    --light: #f4f4f4;
+    --border: #222;
     --accent: #6366f1;
-    --bg: #ffffff;
+    --bg: #0d0d0d;
+    --fg: #f0f0ee;
   }
+
+  html { scroll-behavior: smooth; }
 
   body {
     font-family: 'Noto Sans JP', sans-serif;
     background: var(--bg);
-    color: var(--ink);
+    color: var(--fg);
     font-size: 15px;
     line-height: 1.7;
+    overflow-x: hidden;
   }
 
+  /* ── SPLASH ── */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: #0d0d0d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  #splash-logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(72px, 18vw, 200px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: #f0f0ee;
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  #splash-logo.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #splash.fade-out {
+    opacity: 0;
+    transition: opacity 0.8s ease 0.2s;
+  }
+
+  /* ── NAV ── */
   nav {
-    position: sticky;
-    top: 0;
-    background: rgba(255,255,255,0.9);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0; right: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
-    height: 56px;
+    padding: 0 2.5rem;
+    height: 60px;
     z-index: 100;
+    transition: background 0.3s, border-color 0.3s;
+    border-bottom: 1px solid transparent;
+  }
+
+  nav.scrolled {
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom-color: #222;
   }
 
   .nav-logo {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 20px;
     font-weight: 800;
-    color: var(--ink);
+    color: #f0f0ee;
     text-decoration: none;
     letter-spacing: -0.03em;
+    opacity: 0;
+    transition: opacity 0.4s;
   }
 
-  .nav-logo span { color: var(--accent); }
+  nav.scrolled .nav-logo { opacity: 1; }
 
   .nav-links {
     display: flex;
@@ -84,267 +152,274 @@
   }
 
   .nav-links a {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    color: var(--muted);
+    color: rgba(240,240,238,0.5);
     text-decoration: none;
-    transition: color 0.15s;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 0.2s;
   }
 
-  .nav-links a:hover { color: var(--ink); }
+  .nav-links a:hover { color: #f0f0ee; }
 
   .nav-cta {
-    background: var(--accent);
-    color: #fff !important;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-size: 13px !important;
-    font-weight: 600 !important;
+    background: #f0f0ee !important;
+    color: #0d0d0d !important;
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    text-transform: none !important;
     transition: opacity 0.15s !important;
   }
 
-  .nav-cta:hover { opacity: 0.88; }
+  .nav-cta:hover { opacity: 0.85 !important; }
 
+  /* ── HERO ── */
   .hero {
-    padding: 5rem 2rem 4rem;
-    max-width: 900px;
-    margin: 0 auto;
-    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 2.5rem 5rem;
+    position: relative;
+    overflow: hidden;
   }
 
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #eef2ff;
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(120px, 22vw, 280px);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: rgba(240,240,238,0.03);
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; max-width: 800px; }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
     color: var(--accent);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 14px;
-    border-radius: 999px;
-    margin-bottom: 2rem;
-    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  .hero-badge .dot {
-    width: 6px; height: 6px;
+  .hero-eyebrow::before {
+    content: '';
+    width: 28px;
+    height: 1px;
     background: var(--accent);
-    border-radius: 50%;
-    display: inline-block;
+    display: block;
   }
 
   .hero-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(40px, 7vw, 72px);
+    font-size: clamp(48px, 8vw, 96px);
     font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.05;
     letter-spacing: -0.03em;
-    margin-bottom: 1.5rem;
-    color: var(--ink);
+    color: #f0f0ee;
+    margin-bottom: 2rem;
   }
 
-  .hero-title .highlight {
-    color: var(--accent);
-    position: relative;
-    display: inline-block;
-  }
-
-  .hero-title .highlight::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0; bottom: 4px;
-    height: 4px;
-    background: #c7d2fe;
-    border-radius: 2px;
-    z-index: -1;
+  .hero-title em {
+    font-style: italic;
+    font-weight: 300;
+    color: rgba(240,240,238,0.45);
   }
 
   .hero-sub {
-    font-size: 17px;
-    color: var(--muted);
-    max-width: 520px;
-    margin: 0 auto 2.5rem;
+    font-size: 16px;
+    color: rgba(240,240,238,0.5);
+    max-width: 460px;
     line-height: 1.8;
-  }
-
-  .hero-proverb {
-    font-style: italic;
-    font-size: 13px;
-    color: #a1a1aa;
     margin-bottom: 2.5rem;
   }
 
-  .hero-buttons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
+  .hero-proverb {
+    font-size: 12px;
+    font-style: italic;
+    color: rgba(240,240,238,0.25);
+    margin-bottom: 2.5rem;
   }
+
+  .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
 
   .btn-primary {
-    background: var(--accent);
-    color: #fff;
+    background: #f0f0ee;
+    color: #0d0d0d;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     padding: 13px 26px;
-    border-radius: 10px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+    transition: opacity 0.15s, transform 0.15s;
   }
 
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
 
   .btn-secondary {
-    background: var(--light);
-    color: var(--ink);
+    background: transparent;
+    color: rgba(240,240,238,0.6);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     padding: 13px 26px;
-    border-radius: 10px;
-    border: none;
+    border-radius: 8px;
+    border: 1px solid #333;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: background 0.15s;
+    transition: border-color 0.15s, color 0.15s;
   }
 
-  .btn-secondary:hover { background: var(--border); }
+  .btn-secondary:hover { border-color: #555; color: #f0f0ee; }
 
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid #1e1e1e;
+    margin: 0;
+  }
+
+  /* ── STATS ── */
   .stats {
     display: flex;
     justify-content: center;
-    gap: 3rem;
-    padding: 2.5rem 2rem;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    gap: 4rem;
+    padding: 3rem 2.5rem;
     flex-wrap: wrap;
-    background: var(--light);
+    background: #111;
   }
 
   .stat { text-align: center; }
 
   .stat-num {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: -0.04em;
-    color: var(--ink);
+    color: #f0f0ee;
     display: block;
   }
 
-  .stat-label { font-size: 12px; color: var(--muted); }
+  .stat-label { font-size: 11px; color: rgba(240,240,238,0.35); letter-spacing: 0.05em; text-transform: uppercase; }
 
-  .services { padding: 5rem 2rem; max-width: 960px; margin: 0 auto; }
+  /* ── SECTIONS ── */
+  section { padding: 7rem 2.5rem; }
 
   .section-eyebrow {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--accent);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
   }
 
   .section-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(26px, 4vw, 38px);
+    font-size: clamp(32px, 5vw, 52px);
     font-weight: 800;
     letter-spacing: -0.02em;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+    color: #f0f0ee;
   }
 
-  .section-desc { color: var(--muted); font-size: 15px; margin-bottom: 2.5rem; max-width: 480px; }
+  .section-desc { color: rgba(240,240,238,0.45); font-size: 15px; margin-bottom: 3rem; max-width: 480px; }
+
+  /* ── SERVICES ── */
+  .services { background: #0d0d0d; max-width: 1100px; margin: 0 auto; }
 
   .services-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-
-  @media (max-width: 640px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .about-inner { grid-template-columns: 1fr; gap: 2rem; }
-    .form-row { grid-template-columns: 1fr; }
+    gap: 1px;
+    background: #1e1e1e;
+    border: 1px solid #1e1e1e;
+    border-radius: 16px;
+    overflow: hidden;
   }
 
   .service-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.75rem 1.5rem;
-    transition: box-shadow 0.2s, transform 0.2s;
+    background: #111;
+    padding: 2.5rem 2rem;
+    transition: background 0.2s;
   }
 
-  .service-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.08); transform: translateY(-3px); }
+  .service-card:hover { background: #161616; }
 
   .service-icon {
-    width: 44px; height: 44px;
+    width: 48px; height: 48px;
     border-radius: 12px;
+    background: #1a1a1a;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22px;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #2a2a2a;
   }
-
-  .icon-purple { background: #eef2ff; }
-  .icon-amber  { background: #fffbeb; }
-  .icon-green  { background: #ecfdf5; }
 
   .service-name {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.01em;
+    margin-bottom: 0.75rem;
+    color: #f0f0ee;
   }
 
-  .service-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .service-desc { font-size: 13px; color: rgba(240,240,238,0.4); line-height: 1.7; }
 
-  .about {
-    background: var(--ink);
-    color: #fff;
-    padding: 5rem 2rem;
-  }
+  /* ── ABOUT ── */
+  .about { background: #111; }
 
   .about-inner {
-    max-width: 960px;
+    max-width: 1100px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
+    gap: 5rem;
+    align-items: start;
   }
 
-  .about .section-eyebrow { color: #a5b4fc; }
-  .about .section-title { color: #fff; }
-
-  .about-text { color: #a1a1aa; font-size: 15px; line-height: 1.9; }
+  .about-text { color: rgba(240,240,238,0.45); font-size: 15px; line-height: 1.9; margin-bottom: 2rem; }
 
   .about-card {
-    background: #27272a;
-    border: 1px solid #3f3f46;
+    background: #161616;
+    border: 1px solid #222;
     border-radius: 16px;
     padding: 2rem;
   }
 
   .about-card-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    color: #a1a1aa;
+    color: rgba(240,240,238,0.25);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     margin-bottom: 1.25rem;
   }
 
@@ -352,36 +427,103 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #3f3f46;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #1e1e1e;
     gap: 1rem;
   }
 
   .info-row:last-child { border-bottom: none; }
 
-  .info-label { font-size: 12px; color: #71717a; flex-shrink: 0; }
-  .info-value { font-size: 14px; color: #e4e4e7; text-align: right; }
+  .info-label { font-size: 12px; color: rgba(240,240,238,0.3); flex-shrink: 0; }
+  .info-value { font-size: 13px; color: rgba(240,240,238,0.7); text-align: right; }
 
-  .contact { padding: 5rem 2rem; max-width: 640px; margin: 0 auto; }
+  /* ── TEAM ── */
+  .team { background: #0d0d0d; }
+  .team-inner { max-width: 1100px; margin: 0 auto; }
 
-  .contact-form { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .team-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+
+  .team-card:hover { border-color: #333; }
+
+  .team-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 1.25rem;
+  }
+
+  .team-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #f0f0ee;
+    margin-bottom: 2px;
+  }
+
+  .team-name-en { font-size: 12px; color: rgba(240,240,238,0.3); margin-bottom: 10px; }
+
+  .team-role {
+    background: rgba(99,102,241,0.15);
+    color: #818cf8;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(99,102,241,0.2);
+  }
+
+  .team-bio { font-size: 13px; color: rgba(240,240,238,0.4); line-height: 1.7; }
+
+  /* ── CONTACT ── */
+  .contact { background: #111; }
+  .contact-inner { max-width: 680px; margin: 0 auto; }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; margin-top: 2.5rem; }
 
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
   .form-field { display: flex; flex-direction: column; gap: 6px; }
 
-  .form-field label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
+  .form-field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(240,240,238,0.35);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 
   .form-field input,
   .form-field textarea,
   .form-field select {
-    border: 1.5px solid var(--border);
+    border: 1px solid #2a2a2a;
     border-radius: 10px;
-    padding: 10px 14px;
+    padding: 11px 14px;
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 14px;
-    color: var(--ink);
-    background: var(--bg);
+    color: #f0f0ee;
+    background: #161616;
     outline: none;
     transition: border-color 0.15s;
     width: 100%;
@@ -393,17 +535,19 @@
   .form-field textarea:focus,
   .form-field select:focus { border-color: var(--accent); }
 
-  .form-field textarea { min-height: 110px; resize: vertical; }
+  .form-field textarea { min-height: 120px; resize: vertical; }
+
+  .form-field select option { background: #161616; }
 
   footer {
-    background: var(--light);
-    border-top: 1px solid var(--border);
-    padding: 2rem;
+    background: #0a0a0a;
+    border-top: 1px solid #1a1a1a;
+    padding: 2.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-size: 12px;
-    color: var(--muted);
+    color: rgba(240,240,238,0.2);
     flex-wrap: wrap;
     gap: 1rem;
   }
@@ -412,38 +556,211 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 18px;
     font-weight: 800;
-    color: var(--ink);
+    color: rgba(240,240,238,0.6);
     letter-spacing: -0.03em;
   }
 
-  .footer-logo span { color: var(--accent); }
+  @media (max-width: 640px) {
+    .services-grid { grid-template-columns: 1fr; }
+    .about-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    .form-row { grid-template-columns: 1fr; }
+    nav { padding: 0 1.25rem; }
+    .hero { padding: 0 1.25rem 4rem; }
+  }
+
+  /* ── SCROLL ANIMATIONS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── SERVICE MORE ── */
+  .service-card { cursor: pointer; }
+  .service-more {
+    margin-top: 1rem;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .service-card:hover .service-more { opacity: 1; transform: translateX(0); }
+
+  /* ── MODAL ── */
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 500;
+  }
+
+  #modal-overlay.active { display: block; }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -48%) scale(0.96);
+    width: 90%;
+    max-width: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 20px;
+    padding: 2.5rem;
+    z-index: 600;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .modal.active {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: #222;
+    border: 1px solid #333;
+    color: rgba(240,240,238,0.5);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .modal-close:hover { background: #333; color: #f0f0ee; }
+
+  .modal-icon { font-size: 32px; margin-bottom: 1rem; }
+
+  .modal-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .modal-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #f0f0ee;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .modal-lead {
+    font-size: 14px;
+    color: rgba(240,240,238,0.5);
+    line-height: 1.8;
+    margin-bottom: 1.75rem;
+  }
+
+  .modal-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+
+  .modal-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: #1a1a1a;
+    border: 1px solid #252525;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+  }
+
+  .modal-item-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+  .modal-item-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f0f0ee;
+    margin-bottom: 4px;
+  }
+
+  .modal-item-desc { font-size: 13px; color: rgba(240,240,238,0.4); line-height: 1.6; }
+
+  .modal-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0f0ee;
+    color: #0d0d0d;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .modal-cta:hover { opacity: 0.88; }
+
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="#" class="nav-logo">TEB<span>.</span></a>
+<!-- SPLASH -->
+<div id="splash">
+  <div id="splash-logo">TEB</div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">TEB</a>
   <ul class="nav-links">
     <li><a href="#services">サービス</a></li>
     <li><a href="#about">会社概要</a></li>
+    <li><a href="#team">チーム</a></li>
     <li><a href="#contact" class="nav-cta">お問い合わせ</a></li>
   </ul>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-badge"><span class="dot"></span>オンデマンド販売</div>
-  <h1 class="hero-title">
-    欲しいものを、<br>
-    <span class="highlight">すぐに</span>届ける。
-  </h1>
-  <p class="hero-sub">衣類・日用品・グッズをオンデマンドでお届け。1点から注文できる、新しいショッピング体験。</p>
-  <p class="hero-proverb">"The early bird catches the worm." — 合同会社TEBの由来</p>
-  <div class="hero-buttons">
-    <a href="#services" class="btn-primary">サービスを見る →</a>
-    <a href="#contact" class="btn-secondary">お問い合わせ</a>
+  <div class="hero-bg-text" aria-hidden="true">TEB</div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">合同会社TEB — オンデマンド販売</div>
+    <h1 class="hero-title">
+      欲しいものを、<br>
+      <em>すぐに</em>届ける。
+    </h1>
+    <p class="hero-sub">衣類・日用品・グッズをオンデマンドでお届け。1点から注文できる、新しいショッピング体験。</p>
+    <p class="hero-proverb">"The early bird catches the worm." — 合同会社TEBの由来</p>
+    <div class="hero-buttons">
+      <a href="#services" class="btn-primary">サービスを見る →</a>
+      <a href="#contact" class="btn-secondary">お問い合わせ</a>
+    </div>
   </div>
 </section>
 
+<hr class="divider">
+
+<!-- STATS -->
 <div class="stats">
   <div class="stat">
     <span class="stat-num">1点〜</span>
@@ -451,7 +768,7 @@
   </div>
   <div class="stat">
     <span class="stat-num">3カテゴリ</span>
-    <span class="stat-label">幅広い商品ラインナップ</span>
+    <span class="stat-label">商品ラインナップ</span>
   </div>
   <div class="stat">
     <span class="stat-num">迅速対応</span>
@@ -459,31 +776,137 @@
   </div>
 </div>
 
-<section class="services" id="services">
-  <div class="section-eyebrow">サービス</div>
-  <h2 class="section-title">何でもオンデマンドで。</h2>
-  <p class="section-desc">衣類からグッズまで、あなたのアイデアを素早く形にします。</p>
-  <div class="services-grid">
-    <div class="service-card">
-      <div class="service-icon icon-purple">👕</div>
-      <div class="service-name">衣類</div>
-      <p class="service-desc">Tシャツ、パーカー、エコバッグなど。オリジナルデザインを1点からでもOK。</p>
+<!-- SERVICES -->
+<section id="services">
+  <div class="services reveal">
+    <div class="section-eyebrow">サービス</div>
+    <h2 class="section-title">何でもオンデマンドで。</h2>
+    <p class="section-desc">衣類からグッズまで、あなたのアイデアを素早く形にします。</p>
+    <div class="services-grid">
+      <div class="service-card" onclick="openModal('clothing')">
+        <div class="service-icon">👕</div>
+        <div class="service-name">衣類</div>
+        <p class="service-desc">Tシャツ、パーカー、エコバッグなど。オリジナルデザインを1点からでもOK。</p>
+        <div class="service-more">詳しく見る →</div>
+      </div>
+      <div class="service-card" onclick="openModal('goods')">
+        <div class="service-icon">🏠</div>
+        <div class="service-name">日用品</div>
+        <p class="service-desc">マグカップ、クッション、ポーチなど。暮らしを彩るアイテムをカスタム製作。</p>
+        <div class="service-more">詳しく見る →</div>
+      </div>
+      <div class="service-card" onclick="openModal('novelty')">
+        <div class="service-icon">🎁</div>
+        <div class="service-name">グッズ・ノベルティ</div>
+        <p class="service-desc">イベントや企業向けノベルティにも対応。まとめての注文も歓迎です。</p>
+        <div class="service-more">詳しく見る →</div>
+      </div>
     </div>
-    <div class="service-card">
-      <div class="service-icon icon-amber">🏠</div>
-      <div class="service-name">日用品</div>
-      <p class="service-desc">マグカップ、クッション、ポーチなど。暮らしを彩るアイテムをカスタム製作。</p>
+
+    <!-- MODALS -->
+    <div id="modal-overlay" onclick="closeModal()"></div>
+
+    <div id="modal-clothing" class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-icon">👕</div>
+      <div class="modal-eyebrow">衣類</div>
+      <h3 class="modal-title">あなたのアイデアを、すぐに形に。</h3>
+      <p class="modal-lead">Tシャツ・パーカー・エコバッグなど、オリジナルデザインの衣類を1点から製作・販売します。</p>
+      <div class="modal-list">
+        <div class="modal-item">
+          <div class="modal-item-icon">🎓</div>
+          <div>
+            <div class="modal-item-title">文化祭・サークルのTシャツ</div>
+            <div class="modal-item-desc">クラスやサークルのオリジナルTシャツを少枚数から制作。デザインの相談も受け付けます。</div>
+          </div>
+        </div>
+        <div class="modal-item">
+          <div class="modal-item-icon">🏢</div>
+          <div>
+            <div class="modal-item-title">企業・チームのユニフォーム</div>
+            <div class="modal-item-desc">社名やロゴ入りのポロシャツやパーカーなど、チームの一体感を高めるアイテムを製作します。</div>
+          </div>
+        </div>
+        <div class="modal-item">
+          <div class="modal-item-icon">🛍️</div>
+          <div>
+            <div class="modal-item-title">オリジナルエコバッグ</div>
+            <div class="modal-item-desc">環境にやさしいエコバッグにオリジナルプリント。ギフトやノベルティにも最適です。</div>
+          </div>
+        </div>
+      </div>
+      <a href="#contact" class="modal-cta" onclick="closeModal()">まずは相談する →</a>
     </div>
-    <div class="service-card">
-      <div class="service-icon icon-green">🎁</div>
-      <div class="service-name">グッズ・ノベルティ</div>
-      <p class="service-desc">イベントや企業向けノベルティにも対応。まとめての注文も歓迎です。</p>
+
+    <div id="modal-goods" class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-icon">🏠</div>
+      <div class="modal-eyebrow">日用品</div>
+      <h3 class="modal-title">暮らしに、あなたらしさを。</h3>
+      <p class="modal-lead">マグカップ・クッション・ポーチなど、日常使いのアイテムをオリジナルデザインで製作します。</p>
+      <div class="modal-list">
+        <div class="modal-item">
+          <div class="modal-item-icon">☕</div>
+          <div>
+            <div class="modal-item-title">マグカップ・タンブラー</div>
+            <div class="modal-item-desc">写真やイラストをプリントしたオリジナルマグカップ。プレゼントにも喜ばれます。</div>
+          </div>
+        </div>
+        <div class="modal-item">
+          <div class="modal-item-icon">🛋️</div>
+          <div>
+            <div class="modal-item-title">クッション・タオル</div>
+            <div class="modal-item-desc">インテリアとして飾れるオリジナルクッションや、ギフトに使えるタオルを製作します。</div>
+          </div>
+        </div>
+        <div class="modal-item">
+          <div class="modal-item-icon">👜</div>
+          <div>
+            <div class="modal-item-title">ポーチ・小物</div>
+            <div class="modal-item-desc">使い勝手の良いポーチやスマホケースなど、日常を彩る小物をカスタムオーダーできます。</div>
+          </div>
+        </div>
+      </div>
+      <a href="#contact" class="modal-cta" onclick="closeModal()">まずは相談する →</a>
+    </div>
+
+    <div id="modal-novelty" class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-icon">🎁</div>
+      <div class="modal-eyebrow">グッズ・ノベルティ</div>
+      <h3 class="modal-title">ブランドの想いを、カタチに。</h3>
+      <p class="modal-lead">イベント向けグッズや企業ノベルティを、まとめてオーダーできます。小ロットから大口まで対応。</p>
+      <div class="modal-list">
+        <div class="modal-item">
+          <div class="modal-item-icon">🎪</div>
+          <div>
+            <div class="modal-item-title">イベント・ライブグッズ</div>
+            <div class="modal-item-desc">缶バッジ・アクリルキーホルダー・ステッカーなど、イベントを盛り上げるグッズを制作します。</div>
+          </div>
+        </div>
+        <div class="modal-item">
+          <div class="modal-item-icon">🏢</div>
+          <div>
+            <div class="modal-item-title">企業ノベルティ</div>
+            <div class="modal-item-desc">展示会や周年記念などで配布するノベルティをまとめて製作。ロゴ入りグッズにも対応します。</div>
+          </div>
+        </div>
+        <div class="modal-item">
+          <div class="modal-item-icon">🎓</div>
+          <div>
+            <div class="modal-item-title">学校・部活グッズ</div>
+            <div class="modal-item-desc">卒業記念品や部活のオリジナルグッズを少量から製作できます。予算に合わせてご相談ください。</div>
+          </div>
+        </div>
+      </div>
+      <a href="#contact" class="modal-cta" onclick="closeModal()">まずは相談する →</a>
     </div>
   </div>
 </section>
 
+<!-- ABOUT -->
 <section class="about" id="about">
-  <div class="about-inner">
+  <div class="about-inner reveal">
     <div>
       <div class="section-eyebrow">会社概要</div>
       <h2 class="section-title">早く動く、<br>だから結果が出る。</h2>
@@ -493,75 +916,139 @@
     </div>
     <div class="about-card">
       <div class="about-card-title">基本情報</div>
-      <div class="info-row">
-        <span class="info-label">社名</span>
-        <span class="info-value">合同会社TEB</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">読み</span>
-        <span class="info-value">ティーイービー</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">法人格</span>
-        <span class="info-value">合同会社</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">設立</span>
-        <span class="info-value">2024年8月8日</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">法人番号</span>
-        <span class="info-value">9030003024893</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">所在地</span>
-        <span class="info-value">埼玉県蓮田市椿山４丁目１７番２号</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">事業内容</span>
-        <span class="info-value">衣類・日用品・グッズのオンデマンド販売</span>
+      <div class="info-row"><span class="info-label">社名</span><span class="info-value">合同会社TEB</span></div>
+      <div class="info-row"><span class="info-label">読み</span><span class="info-value">ティーイービー</span></div>
+      <div class="info-row"><span class="info-label">法人格</span><span class="info-value">合同会社</span></div>
+      <div class="info-row"><span class="info-label">設立</span><span class="info-value">2024年8月8日</span></div>
+      <div class="info-row"><span class="info-label">法人番号</span><span class="info-value">9030003024893</span></div>
+      <div class="info-row"><span class="info-label">所在地</span><span class="info-value">埼玉県蓮田市椿山４丁目１７番２号</span></div>
+      <div class="info-row"><span class="info-label">事業内容</span><span class="info-value">衣類・日用品・グッズのオンデマンド販売</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="team">
+  <div class="team-inner reveal">
+    <div class="section-eyebrow">チーム</div>
+    <h2 class="section-title">TEBを動かす人。</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">👤</div>
+        <div class="team-name">川島 一真</div>
+        <div class="team-name-en">Kazuma Kawashima</div>
+        <div class="team-role">CEO</div>
+        <p class="team-bio">早稲田大学在学中。合同会社TEBの運営を担当しながら、グローバル展開を目指して奮闘中。</p>
       </div>
     </div>
   </div>
 </section>
 
+<!-- CONTACT -->
 <section class="contact" id="contact">
-  <div class="section-eyebrow">お問い合わせ</div>
-  <h2 class="section-title">気軽に話しかけてください。</h2>
-  <p class="section-desc" style="color: var(--muted); margin-top: 0.5rem;">どんな小さな質問でもOKです。2営業日以内に返信します。</p>
-  <form class="contact-form" onsubmit="return false;">
-    <div class="form-row">
-      <div class="form-field">
-        <label>お名前</label>
-        <input type="text" placeholder="山田 太郎">
+  <div class="contact-inner reveal">
+    <div class="section-eyebrow">お問い合わせ</div>
+    <h2 class="section-title">気軽に話しかけてください。</h2>
+    <p class="section-desc" style="margin-top: 0.5rem;">どんな小さな質問でもOKです。2営業日以内に返信します。</p>
+    <form class="contact-form" action="https://formspree.io/f/kazumakawashima051228@gmail.com" method="POST">
+      <div class="form-row">
+        <div class="form-field">
+          <label>お名前</label>
+          <input type="text" name="お名前" placeholder="山田 太郎" required>
+        </div>
+        <div class="form-field">
+          <label>メールアドレス</label>
+          <input type="email" name="メールアドレス" placeholder="example@email.com" required>
+        </div>
       </div>
       <div class="form-field">
-        <label>メールアドレス</label>
-        <input type="email" placeholder="example@email.com">
+        <label>お問い合わせの種類</label>
+        <select name="お問い合わせの種類">
+          <option value="">選択してください</option>
+          <option>商品について</option>
+          <option>オーダー・カスタマイズ</option>
+          <option>法人・ノベルティのご相談</option>
+          <option>その他</option>
+        </select>
       </div>
-    </div>
-    <div class="form-field">
-      <label>お問い合わせの種類</label>
-      <select>
-        <option value="">選択してください</option>
-        <option>商品について</option>
-        <option>オーダー・カスタマイズ</option>
-        <option>法人・ノベルティのご相談</option>
-        <option>その他</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label>メッセージ</label>
-      <textarea placeholder="ご質問・ご要望をご自由にどうぞ 😊"></textarea>
-    </div>
-    <button type="submit" class="btn-primary" style="align-self: flex-start;">送信する →</button>
-  </form>
+      <div class="form-field">
+        <label>メッセージ</label>
+        <textarea name="メッセージ" placeholder="ご質問・ご要望をご自由にどうぞ" required></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="align-self: flex-start;">送信する →</button>
+    </form>
+  </div>
 </section>
 
 <footer>
-  <span class="footer-logo">TEB<span>.</span></span>
+  <span class="footer-logo">TEB</span>
   <span>© 2024 合同会社TEB. All rights reserved.</span>
 </footer>
+
+<script>
+  // Splash screen
+  const splash = document.getElementById('splash');
+  const splashLogo = document.getElementById('splash-logo');
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      splashLogo.classList.add('visible');
+    }, 100);
+
+    setTimeout(() => {
+      splash.classList.add('fade-out');
+    }, 1400);
+
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 2400);
+  });
+
+  // Nav scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Modal
+  function openModal(type) {
+    document.getElementById('modal-overlay').classList.add('active');
+    const modal = document.getElementById('modal-' + type);
+    modal.style.display = 'block';
+    setTimeout(() => modal.classList.add('active'), 10);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.querySelectorAll('.modal').forEach(m => {
+      m.classList.remove('active');
+      setTimeout(() => { if (!m.classList.contains('active')) m.style.display = 'none'; }, 250);
+    });
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+</script>
 
 </body>
 </html>
